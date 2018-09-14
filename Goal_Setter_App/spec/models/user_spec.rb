@@ -36,12 +36,21 @@ RSpec.describe User, type: :model do
       user = User.find_by(username: 'Billy')
       expect(user.password).not_to be('Billilly')
     end 
-    it "encrypts password with BCrypt"
+    it "encrypts password with BCrypt" do 
+      expect(BCrypt::Password).to receive(:create).with('Billilly')
+      User.new(username: 'Billy', password: 'Billilly')
+    end 
   end 
   
   describe "user authentication" do 
-    it "returns user if user_password matches"
+    it "returns user if user_password matches" do 
+      user = User.create(username: 'Billy', password: 'Billilly')
+      expect(User.find_by_credentials('Billy', 'Billilly')).to eq(user)
+    end 
     
-    it "returns nil if user_password mismatches"
+    it "returns nil if user_password mismatches" do 
+      user = User.create(username: 'Billy', password: 'Billillyilly')
+      expect(User.find_by_credentials('Billy', 'Billilly')).to be_nil
+    end 
   end 
 end
